@@ -3,6 +3,8 @@ from interfaces.api.deps import get_teacher_repo
 from interfaces.schemas.teacher_schema import TeacherCreateSchema, TeacherResponseSchema
 from infrastructure.db.models.teacher_model import Teacher
 from infrastructure.db.models.specialty_model import Specialty
+from use_cases.create_teacher import create_teacher_use_case
+
 
 router = APIRouter()
 
@@ -13,17 +15,15 @@ def create_teacher(teacher: TeacherCreateSchema, teacher_repo=Depends(get_teache
     """
     Create a new teacher.
     """
-    specialties = teacher.specialties or []
-    # Convert specialties to a list of Specialty objects if they are not empty
-    if specialties:
-        specialties = [Specialty(name=specialty) for specialty in specialties]
-    teacher = teacher.model_dump()
-    teacher['specialties'] = specialties
-    teacher_entity = Teacher(**teacher)
+    # Convert the TeacherCreateSchema to a dictionary
+    teacher_dto = teacher.model_dump()
+    # debug log
+    print(f"Teacher DTO: {teacher_dto}")
 
-    teacher_entity.specialties = specialties
-    created_teacher = teacher_repo.create_teacher(teacher_entity)
-    teacher_response = TeacherResponseSchema(id=created_teacher.id, full_name=created_teacher.full_name,
-                                             specialties=created_teacher.specialties, bio=created_teacher.bio,
-                                             email=created_teacher.email)
-    return teacher_response
+    # Create the teacher using the use case
+    response = create_teacher_use_case(
+        teacher_dto=teacher_dto,
+        teacher_repository=teacher_repo,
+        teacher_schema=TeacherCreateSchema
+    )
+    return response

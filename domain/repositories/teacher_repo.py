@@ -18,7 +18,7 @@ class ITeacherRepository(ABC):
         pass
 
     @abstractmethod
-    def create_teacher(self, teacher: Teacher) -> Teacher:
+    def save(self, teacher: Teacher) -> Teacher:
         """Create a new teacher."""
         pass
 

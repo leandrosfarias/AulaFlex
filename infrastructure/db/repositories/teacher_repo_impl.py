@@ -17,7 +17,7 @@ class TeacherRepoImpl(ITeacherRepository):
         teachers = self.db_session.select(Teacher).offset((page - 1) * page_size).limit(page_size).all()
         return teachers
 
-    def create_teacher(self, teacher: Teacher) -> Teacher:
+    def save(self, teacher: Teacher) -> Teacher:
         # debug log
         print(f"Teacher in repo: {teacher}")
         self.db_session.add(teacher)
