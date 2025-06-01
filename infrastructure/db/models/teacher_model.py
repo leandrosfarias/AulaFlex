@@ -16,7 +16,6 @@ class Teacher(UserModel, table=True):
         nullable=True,
         description="Biography of the teacher"
     )
-    specialty_id: int = Field(foreign_key="specialty.id")
 
     # Navigation properties
     specialties: list["Specialty"] = Relationship(

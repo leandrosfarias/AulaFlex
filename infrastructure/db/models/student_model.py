@@ -15,3 +15,7 @@ class Student(UserModel, table=True):
     lessons: list["Lesson"] = Relationship(
         back_populates="student"
     )
+
+    feedbacks: list["Feedback"] = Relationship(
+        back_populates="student"
+    )

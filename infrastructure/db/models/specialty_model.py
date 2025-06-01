@@ -12,11 +12,12 @@ class Specialty(SQLModel, table=True):
         max_length=100,
         description="Name of the specialty, e.g., Mathematics, Science"
     )
-    description: str = Field(
+    description: str | None = Field(
+        default=None,
         max_length=255,
         description="Description of the specialty"
     )
     teachers: list["Teacher"] = Relationship(
-        back_populates="specialty",
+        back_populates="specialties",
         link_model=TeacherSpecialty
     )

@@ -45,6 +45,10 @@ class Lesson(SQLModel, table=True):
         description="Modality of the lesson (online or in-person)"
     )
 
+    feedbacks: list["Feedback"] = Relationship(
+        back_populates="lesson"
+    )
+
     # Navigation properties
     teacher: "Teacher" = Relationship(
         back_populates="lessons"
