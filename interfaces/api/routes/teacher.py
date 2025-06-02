@@ -64,3 +64,34 @@ def get_teacher(teacher_id: str, teacher_repo=Depends(get_teacher_repo)):
     )
 
     return teacherResponse
+
+
+@router.get("/teachers", response_model=list[TeacherResponseSchema],
+            status_code=status.HTTP_200_OK)
+def get_teachers(page: int = 1, page_size: int = 10, teacher_repo=Depends(get_teacher_repo)):
+    """
+    Get a list of all teachers with pagination.
+    """
+    # Fetch the list of teachers from the repository
+    teachers = teacher_repo.get_teachers(page, page_size)
+    # debug log
+    print(f"Fetched teachers: {teachers}")
+
+    if not teachers:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"error": "No teachers found"}
+        )
+
+    # Map the list of Teacher entities to the response schema
+    teacher_responses = [
+        TeacherResponseSchema(
+            id=teacher.id,
+            full_name=teacher.full_name,
+            email=teacher.email,
+            bio=teacher.bio,
+            specialties=teacher.specialties
+        ) for teacher in teachers
+    ]
+
+    return teacher_responses

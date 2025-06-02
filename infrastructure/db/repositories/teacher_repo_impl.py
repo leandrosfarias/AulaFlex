@@ -1,4 +1,4 @@
-from sqlmodel import Session
+from sqlmodel import Session, select
 from infrastructure.db.models.teacher_model import Teacher
 from typing import Optional
 from uuid import UUID
@@ -14,7 +14,11 @@ class TeacherRepoImpl(ITeacherRepository):
         return self.db_session.get(Teacher, teacher_id)
 
     def get_teachers(self, page: int, page_size: int) -> list[Teacher]:
-        teachers = self.db_session.select(Teacher).offset((page - 1) * page_size).limit(page_size).all()
+        teachers = self.db_session.exec(
+            select(Teacher)
+            .offset((page - 1) * page_size)
+            .limit(page_size)
+        ).all()
         return teachers
 
     def save(self, teacher: Teacher) -> Teacher:
