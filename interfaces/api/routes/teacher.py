@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, status
+from fastapi.responses import JSONResponse
 from interfaces.api.deps import get_teacher_repo
 from interfaces.schemas.teacher_schema import TeacherCreateSchema, TeacherResponseSchema
 from use_cases.create_teacher import create_teacher_use_case
@@ -34,11 +35,26 @@ def get_teacher(teacher_id: str, teacher_repo=Depends(get_teacher_repo)):
     """
     Get a teacher by ID.
     """
-    # Convert the teacher_id to UUID
-    teacher_uuid = UUID(teacher_id)
+    try:
+        teacher_uuid = UUID(teacher_id)
+        print(f"Fetching teacher with ID: {teacher_uuid}")
+    except ValueError:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"error": "Invalid teacher ID format"}
+        )
 
     # Fetch the teacher from the repository
     teacher = teacher_repo.get_teacher_by_id(teacher_uuid)
+    # debug log
+    print(f"Fetched teacher: {teacher}")
+
+    if not teacher:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"error": "Teacher not found"}
+        )
+
     teacherResponse = TeacherResponseSchema(
         id=teacher.id,
         full_name=teacher.full_name,
@@ -46,10 +62,5 @@ def get_teacher(teacher_id: str, teacher_repo=Depends(get_teacher_repo)):
         bio=teacher.bio,
         specialties=teacher.specialties
     )
-    # debug log
-    print(f"Fetched teacher: {teacherResponse}")
-
-    if not teacher:
-        return {"error": "Teacher not found"}, status.HTTP_404_NOT_FOUND
 
     return teacherResponse
